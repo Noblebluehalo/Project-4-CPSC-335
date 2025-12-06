@@ -6,9 +6,6 @@
 #include <iostream>
 #include <string>
 
-// Run-Length Encoding:
-// - Single character run: just the character
-// - Run of k > 1: the number k followed by that character
 std::string runLengthEncode(const std::string &s) {
     if (s.empty()) {
         return "";
