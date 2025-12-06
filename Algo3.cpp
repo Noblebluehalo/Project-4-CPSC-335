@@ -9,14 +9,14 @@
 #include <sstream>
 #include <vector>
 #include <cctype>
-#include <filesystem> // add near other includes
+#include <filesystem> 
 
-// ----- Min-heap structures & functions -----
+
 
 struct HeapNode {
-    int value;      // integer value
-    int listIndex;  // which sub-array it came from
-    int elemIndex;  // index within that sub-array
+    int value;      
+    int listIndex;  
+    int elemIndex;
 };
 
 // Simple min-heap for HeapNode (based on value)
