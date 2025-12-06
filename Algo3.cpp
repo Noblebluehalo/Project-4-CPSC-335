@@ -123,7 +123,7 @@ std::vector<int> mergeKSorted(const std::vector<std::vector<int>>& allLists) {
     return result;
 }
 
-// Helper to trim line (check if it's blank)
+// Helper to trim line 
 bool isBlankLine(const std::string& line) {
     for (char c : line) {
         if (!std::isspace(static_cast<unsigned char>(c))) return false;
@@ -142,7 +142,7 @@ void printVector(const std::vector<int>& v) {
 }
 
 int main() {
-    // Change the filename here if your file is named differently
+    // Change the filename here 
     std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
     std::ifstream fin("in2c.txt");
     if (!fin) {
@@ -150,13 +150,13 @@ int main() {
         return 1;
     }
 
-    std::vector<std::vector<std::vector<int>>> allGroups; // 3 groups
+    std::vector<std::vector<std::vector<int>>> allGroups; 
     std::vector<std::vector<int>> currentGroup;
 
     std::string line;
     while (std::getline(fin, line)) {
         if (isBlankLine(line)) {
-            // blank line: end of a group (if we have one)
+            // blank line: end of a group
             if (!currentGroup.empty()) {
                 allGroups.push_back(currentGroup);
                 currentGroup.clear();
@@ -164,12 +164,12 @@ int main() {
             continue;
         }
 
-        // skip header-only lines like "Array_1  =" but still parse if this line contains data
+        // skip header-only lines 
         if (line.find("Array_") != std::string::npos && line.find('[') == std::string::npos) {
             continue;
         }
 
-        // lines with actual integer arrays: like "[2, 5, 9, 21],"
+        // lines with actual integer 
         if (line.find('[') != std::string::npos) {
             std::vector<int> sub;
             std::stringstream ss(line);
