@@ -6,22 +6,24 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 #include <cctype>
 
 // Convert a string to lowercase
-std::string toLower(const std::string &s) {
-    std::string t = s;
+std::string toLower(const std::string& s) {
+    std::string t;
+    t.reserve(s.size());
     for (char c : s) {
         t.push_back(std::tolower(static_cast<unsigned char>(c)));
     }
     return t;
 }
 
-// Manual substring search: return first index of W in S, or -1 if not found
-int findSubstring(const std::string &S, const std::string &W) {
-    int n = static_cast<int>(S.size());
-    int m = static_cast<int>(W.size());
-    if (m == 0 || m > n) return -1;
+// Manual substring search
+int findSubstring(const std::string& S, const std::string& W) {
+    int n = S.size();
+    int m = W.size();
+    if (m > n) return -1;
 
     for (int i = 0; i <= n - m; ++i) {
         bool match = true;
@@ -36,18 +38,17 @@ int findSubstring(const std::string &S, const std::string &W) {
     return -1;
 }
 
-// Struct to hold found word + index
 struct FoundWord {
     int index;
     std::string word;
 };
 
-// Manual selection sort by index
-void selectionSort(std::vector<FoundWord> &arr) {
-    int n = static_cast<int>(arr.size());
-    for (int i = 0; i < n - 1; ++i) {
+// Manual selection sort
+void selectionSort(std::vector<FoundWord>& arr) {
+    int n = arr.size();
+    for (int i = 0; i < n - 1; i++) {
         int minPos = i;
-        for (int j = i + 1; j < n; ++j) {
+        for (int j = i + 1; j < n; j++) {
             if (arr[j].index < arr[minPos].index) {
                 minPos = j;
             }
@@ -60,85 +61,68 @@ void selectionSort(std::vector<FoundWord> &arr) {
     }
 }
 
-// Do the work for Question 1
-void findTargetTerms(const std::string &A,
-                     const std::vector<std::string> &B,
-                     std::vector<int> &indices,
-                     std::vector<std::string> &wordsOut)
-{
-    std::string lowerA = toLower(A);
-    std::vector<FoundWord> results;
-
-    for (const std::string &word : B) {
-        std::string lowerW = toLower(word);
-        int pos = findSubstring(lowerA, lowerW);
-        if (pos != -1) {
-            FoundWord fw;
-            fw.index = pos;
-            fw.word  = word;   // keep original word
-            results.push_back(fw);
-        }
-    }
-
-    // sort by index using our own selection sort
-    selectionSort(results);
-
-    // separate into output vectors
-    for (const FoundWord &fw : results) {
-        indices.push_back(fw.index);
-        wordsOut.push_back(fw.word);
-    }
-}
-
-// Helper to print int vector
-void printIntVector(const std::vector<int> &v) {
-    std::cout << "[";
-    for (std::size_t i = 0; i < v.size(); ++i) {
-        std::cout << v[i];
-        if (i + 1 < v.size()) std::cout << ", ";
-    }
-    std::cout << "]";
-}
-
-// Helper to print string vector
-void printStringVector(const std::vector<std::string> &v) {
-    std::cout << "[";
-    for (std::size_t i = 0; i < v.size(); ++i) {
-        std::cout << v[i];
-        if (i + 1 < v.size()) std::cout << ", ";
-    }
-    std::cout << "]";
-}
-
 int main() {
     std::string A;
     int n;
 
+    // Ask for A
     std::cout << "Enter the concatenated string A: ";
     std::getline(std::cin, A);
 
+    // Ask for n
     std::cout << "Enter number of words to search for: ";
     std::cin >> n;
+    std::cin.ignore(1000, '\n'); // clear newline
 
-    // clear the rest of the line after reading n
-    std::cin.ignore(1000, '\n');
+    // Ask for B on one line
+    std::cout << "Enter the words on one line: ";
+    std::string line;
+    std::getline(std::cin, line);
 
-    std::vector<std::string> B(n);
-    std::cout << "Enter the words:\n";
-    for (int i = 0; i < n; ++i) {
-        std::getline(std::cin, B[i]);
+    // Split the line into words
+    std::vector<std::string> B;
+    std::stringstream ss(line);
+    std::string word;
+    while (ss >> word) {
+        B.push_back(word);
     }
 
-    std::vector<int> indices;
-    std::vector<std::string> wordsOut;
+    // Ensure we read exactly n words
+    if (B.size() != static_cast<size_t>(n)) {
+        std::cout << "\nERROR: You said " << n << " words but typed "
+            << B.size() << ".\n";
+        return 1;
+    }
 
-    findTargetTerms(A, B, indices, wordsOut);
+    // Lowercase A
+    std::string lowerA = toLower(A);
 
-    std::cout << "\nOutput_order = ";
-    printIntVector(indices);
-    std::cout << "\nOutput_array = ";
-    printStringVector(wordsOut);
-    std::cout << "\n";
+    // Find all matches
+    std::vector<FoundWord> found;
+    for (const std::string& w : B) {
+        int pos = findSubstring(lowerA, toLower(w));
+        if (pos != -1) {
+            found.push_back({ pos, w });
+        }
+    }
+
+    // Sort by index
+    selectionSort(found);
+
+    // Output
+    std::cout << "\nOutput_order = [";
+    for (size_t i = 0; i < found.size(); ++i) {
+        std::cout << found[i].index;
+        if (i + 1 < found.size()) std::cout << ", ";
+    }
+    std::cout << "]\n";
+
+    std::cout << "Output_array = [";
+    for (size_t i = 0; i < found.size(); ++i) {
+        std::cout << found[i].word;
+        if (i + 1 < found.size()) std::cout << ", ";
+    }
+    std::cout << "]\n";
 
     return 0;
 }
